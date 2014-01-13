@@ -26,18 +26,6 @@ module Rubocop
 
           lines = rebuild_tree(node)
 
-          puts node.type
-          puts lines
-#          puts ("*" * 30)
-#          puts "Node: " + node.inspect
-#          puts "Children: " + node.children.inspect
-#          puts "Second Child: " + node.children[2].inspect
-#          puts "Grandchildren: " + node.children[2].children.inspect
-#          puts ("*" * 30)
-          # puts "Args: " + node.children[1].class.name
-          # puts node.children[1].children
-          # puts lines.size
-
           lines.size
         end
 

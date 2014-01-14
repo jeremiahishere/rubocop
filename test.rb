@@ -1,7 +1,9 @@
 # teting
 module Foo
   def bar
-    whee = 2
+    whee = lambda { "hello" }.call
+
+    whee.upcase!
 
     if(whee)
       woo = 3

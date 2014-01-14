@@ -33,8 +33,8 @@ module Rubocop
           # lines with at least 2 nodes covering it
           # lines = lines_with_nodes(node)
 
-          # puts node.inspect
-          # puts lines
+          puts node.inspect
+          puts lines
           lines
         end
 
@@ -94,10 +94,10 @@ module Rubocop
           elsif(node.is_a? Parser::AST::Node)
             if node.children.empty? 
               return 0
-            elsif node.type == :send
+            # elsif node.type == :send
               # when calling a method, don't worry about other methods on the call chain
               # just the first one
-              return 1
+              # return 1
             elsif !has_grandchildren_nodes?(node)
               return 0
             else

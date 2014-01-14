@@ -3,7 +3,7 @@ module Foo
   def bar
     whee = lambda { "hello" }.call
 
-    whee.upcase!
+    whee.downcase.upcase!
 
     if(whee)
       woo = 3

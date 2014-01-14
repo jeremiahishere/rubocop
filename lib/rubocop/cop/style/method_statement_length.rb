@@ -28,13 +28,56 @@ module Rubocop
           # lines = count_nodes(node)
 
           # total number of nodes
-          lines = all_children(node)
+          # lines = all_children(node)
+
+          # lines with at least 2 nodes covering it
+          lines = lines_with_nodes(node)
 
           puts lines
           lines
         end
 
+        def lines_with_nodes(node)
+          nodes = node.children[2].children
+          count = 0
+          nodes.each do |node|
+            puts node.inspect
+            if node.is_a? Parser::AST::Node 
+              count += lines_for_node(node)
+            else
+              count += 1
+            end
+          end
+          return count
+        end
+
+        def lines_for_node(node)
+          count = 0
+          @lines ||= {}
+          if(node.location.expression)
+            begin_line = node.location.expression.line
+            # I bet there is a better way to do this
+            end_line = node.location.expression.instance_variable_get(:@source_buffer).decompose_position(node.location.expression.end_pos)[0]
+            # puts begin_line.to_s + ":" + end_line.to_s
+
+            count += 1 unless @lines[begin_line]
+
+            (begin_line..end_line).each do |line_num|
+              @lines[line_num] = true
+            end
+          end
+
+          child_nodes = node.children.select { |c| c.is_a? Parser::AST::Node }
+          # child_nodes.each do |c|
+          #   count += lines_with_nodes(c)
+          # end
+
+          puts @lines.inspect
+          return count
+        end
+
         def all_children(node)
+          puts node.location.expression.inspect
           count = node.children.size
           child_nodes = node.children.select { |c| c.is_a? Parser::AST::Node }
           child_nodes.each do |c|

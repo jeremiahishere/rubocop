@@ -22,12 +22,25 @@ module Rubocop
           # lines.reject! { |line| irrelevant_line(line) }
 
           # number of statements (naive solution with no nested code of any type)
-          lines = node.children[2].children
+          # lines = node.children[2].children
 
-          lines = count_nodes(node)
+          # number of nodes with a grandchild that is also a node (not a symbol)
+          # lines = count_nodes(node)
+
+          # total number of nodes
+          lines = all_children(node)
 
           puts lines
           lines
+        end
+
+        def all_children(node)
+          count = node.children.size
+          child_nodes = node.children.select { |c| c.is_a? Parser::AST::Node }
+          child_nodes.each do |c|
+            count += all_children(c)
+          end
+          return count
         end
 
         def count_nodes(node)

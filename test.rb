@@ -1,11 +1,24 @@
 # teting
 module Foo
   def bar
-    whee = lambda { "hello" }.call
+    # whee = lambda { 'hello' }.call
+    whee = '1' +
+      '2' +
+      '3'
 
-    whee.downcase.upcase!
+    a = 1
+    b = 2
+    c = 3
+    d = 4
+    e = 5
+    f = 6
+    g = 7
+    h = 8
+    i = 9
 
-    if(whee)
+    whee.downcase.upcase
+
+    if whee
       woo = 3
       wooo = 4
     end

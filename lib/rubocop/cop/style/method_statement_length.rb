@@ -13,7 +13,7 @@ module Rubocop
         private
 
         def message
-          'Method statement has too many lines. [%d/%d]'
+          'Method is too complex. [%d/%d]'
         end
 
         def code_length(node)
@@ -25,15 +25,16 @@ module Rubocop
           # lines = node.children[2].children
 
           # number of nodes with a grandchild that is also a node (not a symbol)
-          # lines = count_nodes(node)
+          lines = count_nodes(node)
 
           # total number of nodes
           # lines = all_children(node)
 
           # lines with at least 2 nodes covering it
-          lines = lines_with_nodes(node)
+          # lines = lines_with_nodes(node)
 
-          puts lines
+          # puts node.inspect
+          # puts lines
           lines
         end
 
@@ -41,7 +42,7 @@ module Rubocop
           nodes = node.children[2].children
           count = 0
           nodes.each do |node|
-            puts node.inspect
+            # puts node.inspect
             if node.is_a? Parser::AST::Node 
               count += lines_for_node(node)
             else
@@ -77,7 +78,7 @@ module Rubocop
         end
 
         def all_children(node)
-          puts node.location.expression.inspect
+          # puts node.location.expression.inspect
           count = node.children.size
           child_nodes = node.children.select { |c| c.is_a? Parser::AST::Node }
           child_nodes.each do |c|
@@ -93,11 +94,15 @@ module Rubocop
           elsif(node.is_a? Parser::AST::Node)
             if node.children.empty? 
               return 0
+            elsif node.type == :send
+              # when calling a method, don't worry about other methods on the call chain
+              # just the first one
+              return 1
             elsif !has_grandchildren_nodes?(node)
               return 0
             else
-              puts "found a node with node grandchildren"
-              puts node.children.inspect
+              # puts "found a node with node grandchildren"
+              # puts node.children.inspect
               child_counts = node.children.map { |child| count_nodes(child) }
               return 1 + child_counts.inject { |sum, count| sum + count }
             end
@@ -114,33 +119,33 @@ module Rubocop
         end
 
         def rebuild_tree(node)
-          puts node.inspect
+          # puts node.inspect
 
           # this should never be reached, hopefully
           if(!node)
             return 0
           # things that have the format (:name, (args), (begin ...))
           elsif([:def, :defs].include?(node.type))
-            puts "def called"
+            # puts "def called"
             return 1 + rebuild_tree(node.children[2])
           # things that have the format (:name, (lambda), (args), (begin ...))
           elsif([:block].include?(node.type))
-            puts "block called"
+            # puts "block called"
             return 1 + rebuild_tree(node.children[3])
           # things that have the format (:name, (begin ...))
           elsif([:begin, :kwbegin, :class, :sclass, :module].include?(node.type)) 
-            puts "begin/class/module called"
+            # puts "begin/class/module called"
             return 1 + node.children.map { |child| rebuild_tree(child) }.inject { |sum, child| sum + child }
           # things that have the format(:if, (condition), (true code), (false code))
           # handles if, elsif, and ternaries
           elsif([:if].include?(node.type)) 
-            puts "if called"
+            # puts "if called"
             lines = 1
             lines += rebuild_tree(node.children[2])
             lines += rebuild_tree(node.children[3]) if node.children[3]
             return lines
           else
-            puts "standard node called"
+            # puts "standard node called"
             return 1
           end
         end
